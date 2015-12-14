@@ -61,9 +61,11 @@ class StatisticsSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Statistics
         fields = ('id', 'team', 'wins', 'draws', 'lost', 'goals_for', 'goals_against', 'points')
+        depth=1
 
 
 class MatchSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     home_team = SimpleTeamSerializer()
     away_team = SimpleTeamSerializer()
     home_ft_score = serializers.IntegerField()
@@ -81,5 +83,7 @@ class SimpleMatchSerializer(serializers.BaseSerializer):
                                                                     home_score=instance.home_ft_score,
                                                                     away_score=instance.away_ft_score),
             'venue': instance.venue.name,
-            'date': instance.date
+            'date': instance.date,
+            'stage': instance.stage,
+            'competition': instance.competition.id
         }

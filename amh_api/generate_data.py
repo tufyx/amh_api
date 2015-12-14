@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from models import Club, Level, Referee, Venue, Team, Player, Season, Competition, Match
+from models import Club, Level, Referee, Venue, Team, Player, Season, Competition, Match, Statistics
 from enums import Gender
 from datetime import date
 from random import randint, shuffle
@@ -52,13 +52,17 @@ women_last_names = ["Herrem", "Lunde", "Mork", "Lokke", "Sulland", "Kurtovic", "
                     "Radicevic", "Pavicevic", "Radovic", "Jovanovic", "Cvijic", "Lazovic"]
 
 
-
-
 def clean():
     Club.objects.all().delete()
-    Venue.objects.all().delete()
     Level.objects.all().delete()
     Referee.objects.all().delete()
+    Venue.objects.all().delete()
+    Team.objects.all().delete()
+    Player.objects.all().delete()
+    Season.objects.all().delete()
+    Competition.objects.all().delete()
+    Match.objects.all().delete()
+    Statistics.objects.all().delete()
 
 
 def build_clubs():
@@ -86,6 +90,7 @@ def random_dob():
     day = randint(1, 28 if month == 2 else 30)
     return date(year, month, day)
 
+
 def build_referees():
     for r in referees:
         name = r.rsplit(' ', 1)
@@ -97,7 +102,7 @@ def build_teams():
     clubs = Club.objects.all()
     levels = Level.objects.all()
     for c in clubs:
-        count_teams = randint(2,6)
+        count_teams = randint(1, 3)
         index = 0
         selected = []
         while index < count_teams:
@@ -141,12 +146,12 @@ def build_players():
 
 
 def build_seasons():
-    count_seasons = randint(3,6)
+    count_seasons = 1 #randint(3, 6)
     index = 0
     year = 2011
     while index < count_seasons:
-        start_date = date(year,9,15)
-        end_date = date(year + 1,5,30)
+        start_date = date(year, 9, 15)
+        end_date = date(year + 1, 5, 30)
         name = 'Season {start_date} - {end_date}'.format(start_date=start_date, end_date=end_date)
         Season(name=name, start_date=start_date, end_date=end_date).save()
         year += 1
@@ -156,7 +161,7 @@ def build_seasons():
 def build_competitions():
     seasons = Season.objects.all()
     for s in seasons:
-        count_competitions = randint(3,6)
+        count_competitions = 2 # randint(3,6)
         levels = Level.objects.all()
         index = 0
         while index < count_competitions:
@@ -164,31 +169,8 @@ def build_competitions():
             name = 'S_{id}-C_{index}'.format(id=s.id, index=index)
             c = Competition(name=name, level=level, season=s)
             c.save()
-            c.build_matches()
-            c.build_statistics()
+            c.build()
             index += 1
-
-
-def add_teams_to_competitions():
-    competitions = Competition.objects.all()
-    for c in competitions:
-        teams = list(Team.objects.filter(level=c.level))
-        shuffle(teams)
-        selected_teams = teams[:randint(3, len(teams)/2)]
-        for t in selected_teams:
-            c.teams.add(t)
-
-
-def build_matches():
-    competitions = Competition.objects.all()
-    for c in competitions:
-        c.build_matches()
-
-
-def build_statistics():
-    competitions = Competition.objects.all()
-    for c in competitions:
-        c.build_statistics()
 
 
 def update_matches():
@@ -198,30 +180,30 @@ def update_matches():
 
     ref_count = referees.count()
     venues_count = venues.count()
-    for m in matches:
-        hht = randint(10,15)
-        aht = randint(10,15)
-        hft = randint(20,38)
-        aft = randint(20,38)
+    fraction = 2 * matches.count() / 3
+    for m in matches[:fraction]:
+        hht = randint(10, 15)
+        aht = randint(10, 15)
+        hft = randint(20, 38)
+        aft = randint(20, 38)
         venue = venues[randint(0, venues_count - 1)]
         referee_a = referees[randint(0, ref_count - 1)]
         referee_b = referees[randint(0, ref_count - 1)]
         timekeeper = referees[randint(0, ref_count - 1)]
         scorer = referees[randint(0, ref_count - 1)]
-        m.update(hht, hft, aht, aft, venue, referee_a, referee_b, timekeeper, scorer)
+        stage = randint(1, 15)
+        m.update(hht, hft, aht, aft, venue, referee_a, referee_b, timekeeper, scorer, stage)
 
 
 def bootstrap():
-    # clean()
-    # build_clubs()
-    # build_levels()
-    # build_venues()
-    # build_referees()
-    # build_teams()
-    # build_players()
-
-    # build_competitions()
-    # build_matches()
-    # build_statistics()
+    clean()
+    build_clubs()
+    build_levels()
+    build_venues()
+    build_referees()
+    build_teams()
+    build_players()
+    build_seasons()
+    build_competitions()
 
     update_matches()

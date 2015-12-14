@@ -5,17 +5,20 @@ from amh_api.models import Club, Team, Player
 from amh_api.serializers import ClubSerializer, TeamSerializer, PlayerSerializer
 
 
-class ClubList(generics.ListAPIView):
+class ClubList(generics.ListCreateAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
 
 
-class ClubDetail(generics.RetrieveAPIView):
+class ClubDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
 
 
-class ClubTeams(ClubDetail):
+class ClubTeams(generics.RetrieveAPIView):
+    queryset = Club.objects.all()
+    serializer_class = ClubSerializer
+
     def get(self, request, *args, **kwargs):
         club = self.get_object()
         teams = Team.objects.filter(club=club)
@@ -23,7 +26,10 @@ class ClubTeams(ClubDetail):
         return Response(serializer.data)
 
 
-class ClubPlayers(ClubDetail):
+class ClubPlayers(generics.RetrieveAPIView):
+    queryset = Club.objects.all()
+    serializer_class = ClubSerializer
+
     def get(self, request, *args, **kwargs):
         club = self.get_object()
         players = Player.objects.filter(club=club)

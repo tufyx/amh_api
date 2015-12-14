@@ -6,6 +6,7 @@ urlpatterns = [
     #referees URLs
     url(r'^referees/$', referees.RefereeList.as_view(), name='referee-list'),
     url(r'^referees/(?P<pk>[0-9]+)/$', referees.RefereeDetail.as_view(), name='referee-detail'),
+    url(r'^referees/(?P<pk>[0-9]+)/matches$', referees.RefereeMatches.as_view(), name='referee-matches'),
 
     # venues URLs
     url(r'^venues/$', venues.VenueList.as_view(), name='venue-list'),
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^teams/$', teams.TeamList.as_view(), name='team-list'),
     url(r'^teams/(?P<pk>[0-9]+)/$', teams.TeamDetail.as_view(), name='team-detail'),
     url(r'^teams/(?P<pk>[0-9]+)/players$', teams.TeamPlayers.as_view(), name='team-players'),
+    url(r'^teams/(?P<pk>[0-9]+)/matches$', teams.TeamMatches.as_view(), name='team-matches'),
 
     # player URLs
     url(r'^players/$', players.PlayerList.as_view(), name='player-list'),

@@ -4,6 +4,7 @@ from django.db import models
 from amh_api.enums import Gender, Status
 from datetime import date
 from collections import deque
+from random import shuffle, randint
 
 
 class Level(models.Model):
@@ -115,6 +116,23 @@ class Competition(models.Model):
             Statistics(competition=self, team=team).save()
 
 
+    def build(self):
+        # add the teams
+        self.add_teams()
+        # build the round robin tournament matches
+        self.build_matches()
+        # create dummy data for stats
+        self.build_statistics()
+
+
+    # TODO - remove the randomized element in this function
+    def add_teams(self):
+        teams = list(Team.objects.filter(level=self.level))
+        shuffle(teams)
+        selected_teams = teams[:randint(3, len(teams)/2)]
+        for t in selected_teams:
+            self.teams.add(t)
+
 class Statistics(models.Model):
     competition = models.ForeignKey(Competition)
     team = models.ForeignKey(Team)
@@ -143,7 +161,7 @@ class Match(models.Model):
     competition = models.ForeignKey(Competition)
     venue = models.ForeignKey(Venue, blank=True, null=True)
 
-    def update(self, hht, hft, aht, aft, venue, ref_a, ref_b, timekeeper, scorer):
+    def update(self, hht, hft, aht, aft, venue, ref_a, ref_b, timekeeper, scorer, stage):
         self.home_ht_score = hht
         self.home_ft_score = hft
         self.away_ht_score = aht
@@ -153,6 +171,7 @@ class Match(models.Model):
         self.referee_b = ref_b
         self.timekeeper = timekeeper
         self.scorer = scorer
+        self.stage = stage
 
         home_team_stat = Statistics.objects.get(team=self.home_team, competition=self.competition)
         away_team_stat = Statistics.objects.get(team=self.away_team, competition=self.competition)
