@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from amh_api.enums import Gender, Status
+from amh_api.enums import Gender, Status, Points
 from datetime import date
 from collections import deque
 from random import shuffle, randint
@@ -21,6 +21,22 @@ class Level(models.Model):
 class Club(models.Model):
     name = models.CharField(max_length=255, blank=False)
     image = models.CharField(max_length=255, blank=True, default='')
+
+    def build_teams(self):
+        levels = Level.objects.all()
+        count_teams = randint(1, 3)
+        index = 0
+        selected = []
+        while index < count_teams:
+            level = levels[randint(0, levels.count() - 1)]
+            while level in selected:
+                level = levels[randint(0, levels.count() - 1)]
+            selected.append(level)
+            team_name = '{club_name} {level_name}'.format(club_name=self.name, level_name=level.description)
+            t = Team(name=team_name, club=self)
+            t.save()
+            t.level.add(level)
+            index += 1
 
 
 class Referee(models.Model):
@@ -44,8 +60,8 @@ class Player(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=255, blank=False)
     club = models.ForeignKey(Club)
-    players = models.ManyToManyField(Player)
-    level = models.ManyToManyField(Level)
+    players = models.ManyToManyField(Player, related_name='players')
+    level = models.ManyToManyField(Level, related_name='level')
 
 
 class Venue(models.Model):
@@ -73,7 +89,7 @@ class Competition(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES, default=Status.SCHEDULED)
     level = models.ForeignKey(Level)
     season = models.ForeignKey(Season)
-    teams = models.ManyToManyField(Team)
+    teams = models.ManyToManyField(Team, related_name='teams')
 
     def build_matches(self):
         from random import randint
@@ -185,18 +201,18 @@ class Match(models.Model):
             home_team_stat.wins += 1
             away_team_stat.lost += 1
 
-            home_team_stat.points += 2
+            home_team_stat.points += Points.WIN
         elif hft < aft:
             home_team_stat.lost += 1
             away_team_stat.wins += 1
 
-            away_team_stat.points += 2
+            away_team_stat.points += Points.WIN
         else:
             home_team_stat.draws += 1
             away_team_stat.draws += 1
 
-            home_team_stat.points += 1
-            away_team_stat.points += 1
+            home_team_stat.points += Points.DRAW
+            away_team_stat.points += Points.DRAW
 
         home_team_stat.save()
         away_team_stat.save()

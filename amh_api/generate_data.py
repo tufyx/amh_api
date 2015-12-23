@@ -4,6 +4,7 @@ from models import Club, Level, Referee, Venue, Team, Player, Season, Competitio
 from enums import Gender
 from datetime import date
 from random import randint, shuffle
+from django.db import models
 
 clubs = ['THW Kiel', 'MKB Veszprem', 'Paris St-Germain', 'Flensburg Handewitt', 'KIF Kolding', 'Montpelier AHB',
          'FC Barcelona', 'Ciudad Real', 'CAI Aragon', 'SC Benfica', 'ABC Braga', 'Rhein Neckar Lowen', 'Hamburg SV',
@@ -69,6 +70,7 @@ def build_clubs():
     for c in clubs:
         club = Club(name=c)
         club.save()
+        club.build_teams()
 
 
 def build_levels():
@@ -96,25 +98,6 @@ def build_referees():
         name = r.rsplit(' ', 1)
         referee = Referee(first_name=name[0], last_name=name[1], date_of_birth=random_dob())
         referee.save()
-
-
-def build_teams():
-    clubs = Club.objects.all()
-    levels = Level.objects.all()
-    for c in clubs:
-        count_teams = randint(1, 3)
-        index = 0
-        selected = []
-        while index < count_teams:
-            level = levels[randint(0, levels.count() - 1)]
-            while level in selected:
-                level = levels[randint(0, levels.count() - 1)]
-            selected.append(level)
-            team_name = '{club_name} {level_name}'.format(club_name=c.name, level_name=level.description)
-            t = Team(name=team_name, club=c)
-            t.save()
-            t.level.add(level)
-            index += 1
 
 
 def build_players():
@@ -195,15 +178,24 @@ def update_matches():
         m.update(hht, hft, aht, aft, venue, referee_a, referee_b, timekeeper, scorer, stage)
 
 
+# def build_team_players():
+#     clubs = Club.objects.all()
+#     for c in clubs[:1]:
+#         teams_per_club = Team.objects.filter(club=c)
+#         for team in teams_per_club:
+#             print team.level
+            # players_per_club = Player.objects.filter(condition = models.Q(club=c) | models.Q(gender=team.level.gender))
+            # shuffle(players_per_club)
+            # team.players.add(players_per_club[:14])
+
 def bootstrap():
     clean()
-    build_clubs()
     build_levels()
     build_venues()
     build_referees()
-    build_teams()
+    build_clubs()
     build_players()
+    # build_team_players()
     build_seasons()
     build_competitions()
-
     update_matches()

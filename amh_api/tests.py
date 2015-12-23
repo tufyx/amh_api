@@ -23,4 +23,9 @@ class RefereesTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data,[{'date': None, 'venue': u'Boris Trajkovski Arena', 'm': 'Flensburg Handewitt U17 male - HC Metalurg U17 male 35-36', 'competition': 166L, 'stage': 13L}, {'date': None, 'venue': u'Westfalenhalle', 'm': 'HC Metalurg U17 male - Ikast Bording U17 male 37-32', 'competition': 166L, 'stage': 12L}])
+        self.assertEqual(response.data, [{'date': None, 'venue': u'Boris Trajkovski Arena',
+                                         'm': 'Flensburg Handewitt U17 male - HC Metalurg U17 male 35-36',
+                                         'competition': 166L, 'stage': 13L},
+                                        {'date': None, 'venue': u'Westfalenhalle',
+                                         'm': 'HC Metalurg U17 male - Ikast Bording U17 male 37-32',
+                                         'competition': 166L, 'stage': 12L}])

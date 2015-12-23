@@ -14,6 +14,12 @@ class LevelSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'name', 'gender')
 
 
+class MyLevelSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Level
+        fields = ('name', 'gender')
+
+
 class VenueSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Venue
@@ -29,14 +35,14 @@ class ClubSerializer(serializers.HyperlinkedModelSerializer):
 class TeamSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
-    level = LevelSerializer()
+    level = MyLevelSerializer()
     club = ClubSerializer()
 
 
 class SimpleTeamSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Team
-        fields = ('id', 'name')
+        fields = ('id', 'name', 'level')
 
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):

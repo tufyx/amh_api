@@ -21,4 +21,6 @@ class LevelTeams(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         teams = Team.objects.filter(level=self.get_object())
+        for t in teams:
+            print t.level
         return Response(TeamSerializer(teams, many=True, context={'request': request}).data)

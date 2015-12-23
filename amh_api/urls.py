@@ -29,6 +29,8 @@ urlpatterns = [
     url(r'^teams/(?P<pk>[0-9]+)/$', teams.TeamDetail.as_view(), name='team-detail'),
     url(r'^teams/(?P<pk>[0-9]+)/players$', teams.TeamPlayers.as_view(), name='team-players'),
     url(r'^teams/(?P<pk>[0-9]+)/matches$', teams.TeamMatches.as_view(), name='team-matches'),
+    url(r'^teams/(?P<pk>[0-9]+)/competitions$', teams.TeamCompetitions.as_view(), name='team-matches'),
+    url(r'^teams/(?P<pk>[0-9]+)/levels', teams.TeamLevels.as_view(), name='team-levels'),
 
     # player URLs
     url(r'^players/$', players.PlayerList.as_view(), name='player-list'),
