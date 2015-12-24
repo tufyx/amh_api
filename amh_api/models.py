@@ -6,7 +6,7 @@ from datetime import date
 from collections import deque
 from random import shuffle, randint
 
-# test comment
+
 class Level(models.Model):
     GENDER_CHOICES = [(Gender.MALE, 'male'),
                       (Gender.FEMALE, 'female')]
