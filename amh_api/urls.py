@@ -1,5 +1,7 @@
 from django.conf.urls import url
-from amh_api.views import base, clubs, levels, referees, teams, venues, players, matches, seasons, competitions
+from django.conf.urls.static import static
+from django.conf import settings
+from amh_api.views import base, clubs, levels, referees, teams, venues, players, matches, seasons, competitions, file_upload
 
 urlpatterns = [
 
@@ -52,6 +54,7 @@ urlpatterns = [
     url(r'^competitions/(?P<pk>[0-9]+)/teams', competitions.CompetitionTeams.as_view(), name='competition-teams'),
     url(r'^competitions/(?P<pk>[0-9]+)/statistics', competitions.CompetitionStatistics.as_view(), name='competition-statistics'),
 
+    url(r'^image/upload', file_upload.FileUploadView.as_view(), name='file-upload'),
 
     url(r'^$', base.api_root)
 ]

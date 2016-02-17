@@ -66,9 +66,12 @@ def clean():
     Statistics.objects.all().delete()
 
 
+def random_image_name():
+    return '{image_name}.png'.format(image_name=randint(1,21))
+
 def build_clubs():
     for c in clubs:
-        club = Club(name=c)
+        club = Club(name=c, image=random_image_name())
         club.save()
         club.build_teams()
 
@@ -129,7 +132,7 @@ def build_players():
 
 
 def build_seasons():
-    count_seasons = 1 #randint(3, 6)
+    count_seasons = randint(3, 6)
     index = 0
     year = 2011
     while index < count_seasons:
@@ -144,7 +147,7 @@ def build_seasons():
 def build_competitions():
     seasons = Season.objects.all()
     for s in seasons:
-        count_competitions = 2 # randint(3,6)
+        count_competitions = randint(3,6)
         levels = Level.objects.all()
         index = 0
         while index < count_competitions:
@@ -178,15 +181,17 @@ def update_matches():
         m.update(hht, hft, aht, aft, venue, referee_a, referee_b, timekeeper, scorer, stage)
 
 
-# def build_team_players():
-#     clubs = Club.objects.all()
-#     for c in clubs[:1]:
-#         teams_per_club = Team.objects.filter(club=c)
-#         for team in teams_per_club:
-#             print team.level
-            # players_per_club = Player.objects.filter(condition = models.Q(club=c) | models.Q(gender=team.level.gender))
-            # shuffle(players_per_club)
-            # team.players.add(players_per_club[:14])
+def build_team_players():
+    clubs = Club.objects.all()
+    for c in clubs:
+        teams_per_club = Team.objects.filter(club=c)
+        for team in teams_per_club:
+            level = team.level.get_queryset()[0]
+            players_per_club = list(Player.objects.filter(models.Q(club=c) & models.Q(gender=level.gender)))
+            shuffle(players_per_club)
+            for p in players_per_club[:14]:
+                team.players.add(p)
+
 
 def bootstrap():
     clean()
@@ -195,7 +200,7 @@ def bootstrap():
     build_referees()
     build_clubs()
     build_players()
-    # build_team_players()
+    build_team_players()
     build_seasons()
     build_competitions()
     update_matches()

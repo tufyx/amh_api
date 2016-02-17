@@ -6,7 +6,7 @@ from datetime import date
 from collections import deque
 from random import shuffle, randint
 
-# test comment
+
 class Level(models.Model):
     GENDER_CHOICES = [(Gender.MALE, 'male'),
                       (Gender.FEMALE, 'female')]
@@ -21,6 +21,10 @@ class Level(models.Model):
 class Club(models.Model):
     name = models.CharField(max_length=255, blank=False)
     image = models.CharField(max_length=255, blank=True, default='')
+
+    @property
+    def image_path(self):
+        return 'http://127.0.0.1:8000/static/images/{img}'.format(img=self.image)
 
     def build_teams(self):
         levels = Level.objects.all()
@@ -61,7 +65,7 @@ class Team(models.Model):
     name = models.CharField(max_length=255, blank=False)
     club = models.ForeignKey(Club)
     players = models.ManyToManyField(Player, related_name='players')
-    level = models.ManyToManyField(Level, related_name='level')
+    level = models.ManyToManyField(Level, related_name='levels')
 
 
 class Venue(models.Model):
@@ -145,7 +149,7 @@ class Competition(models.Model):
     def add_teams(self):
         teams = list(Team.objects.filter(level=self.level))
         shuffle(teams)
-        selected_teams = teams[:randint(3, len(teams)/2)]
+        selected_teams = teams[:randint(1, len(teams)/2)]
         for t in selected_teams:
             self.teams.add(t)
 
